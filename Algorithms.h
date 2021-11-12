@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <stdarg.h>
 
 template<typename T>
 std::vector<T> Split(const T& value, typename T::value_type delim)
@@ -170,6 +171,164 @@ bool RemoveValFor(TVec& vec, const typename TVec::value_type& val)
     return false;
 }
 
+
+template<typename TArray>
+struct TIndexerVector{
+    typename TArray::reference operator() (TArray& array, int index)
+    {
+        return array[index];
+    }
+    bool contains(TArray& array, int index) const
+    {
+        return index < array.size();
+    }
+};
+//Возвращает в зависимости от шаблонного параметра isCol
+// либо значение столбца, либо значение строки под индексом index из двумерного массива array
+template<typename TArray, bool isCol>
+struct TIndexerMatrix{
+    typename TArray::value_type::reference operator() (TArray& array, int index)
+    {
+        if constexpr(isCol)
+            return array[indFix][index];
+        else
+            return array[index][indFix];
+    }
+    bool contains(TArray& array, int index) const
+    {
+        if constexpr(isCol)
+            return indFix < array.size() && index < array[indFix].size();
+        else
+            return index < array.size() && indFix < array[index].size();
+    }
+    size_t indFix = 0;
+};
+template<typename TArray, typename TIndexer = TIndexerVector<TArray> >
+void TakeAndMove(TArray& array, int opos, int npos, TIndexer get = TIndexer())
+{
+    if(get.contains(array, opos) == false)
+        return;
+    auto el = get(array, opos);  //сохраняем элемент, который двигаем
+    if(el == nullptr) return;
+    int chg = opos > npos ? -1 : 1;
+    for(int i = opos; i != npos; i += chg)
+        get(array, i) = get(array, i + chg);
+    get(array, npos) = el;//присваиваем перемещенный элемент
+}
+
+inline const char* PtrText(const char* value) { return value; }
+inline const char* PtrText(const TString& value) { return STR(value); }
+
+#define STDFORMAT(FRMT, ...) StdFormat(std::snprintf(nullptr, 0, PtrText(FRMT), __VA_ARGS__) + 1, PtrText(FRMT), __VA_ARGS__)
+
+TString Transliteration(TString utf8text);
+
+inline std::string StdFormat(int sizeBuf, const char* frmt,  ...)
+{
+    va_list args;
+    va_start(args, frmt);
+    std::vector<char> buf(sizeBuf);
+    std::vsnprintf(&buf[0], buf.size(), frmt, args);
+    return &buf[0];
+}
+
+
+class TFormatDouble{
+private:
+    int maxEndCount;//максимум знаков после запятой
+    int maxBegCount;//максимум пять знаков перед запятой
+    int beginCheck;//для 5ти знаков будет максимальное 1000000
+    int endCheck;
+    bool isUseUtf8 = true;
+    static constexpr uint8_t textPows[8][8] = {
+            {0xC3, 0x97, '1', '0', 0xC2, 0xB2, 0},        // * 10 ^ 2
+            {0xC3, 0x97, '1', '0', 0xC2, 0xB3, 0},        // 3
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB4, 0},  //4
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB5, 0},  //5
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB6, 0},  //6
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB7, 0},  //7
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB8, 0},  //8
+            {0xC3, 0x97, '1', '0', 0xE2, 0x81, 0xB9, 0}   //9
+    };
+public:
+    TFormatDouble(int maxEnd = 3, int maxBeg = 6){ Set(maxEnd, maxBeg); }
+
+    void Set(int maxEnd, int maxBeg = 6)
+    {
+        maxEndCount = maxEnd;
+        maxBegCount = std::max(2, maxBeg);
+
+        beginCheck = int(std::pow(10, maxBegCount));
+        endCheck = int(std::pow(10, maxEndCount));
+    }
+    TString Format(double value, double eps)
+    {
+        if(eps >= 1) return Round(value);
+        int begVal = int(value);
+        int endVal = int((value - begVal + 0.0000001) * endCheck);
+        int chk = 10;
+        int count = maxEndCount;
+        while(endVal % chk == 0 && count > 0)
+        {
+            count--;
+            chk *= 10;
+        }
+        return STDFORMAT("%.*f", count, value);
+    }
+
+    TString Round(double value) const
+    {
+        if(std::isnan(value))
+            return "nan";
+        if(value < beginCheck)
+        {
+            int begVal = int(value);
+            int endVal = int((value - begVal + 0.0000001) * endCheck);
+
+            if(endVal)
+            {
+                int endCheckVal = endCheck;
+                while (endCheckVal > 1)
+                {
+                    endCheckVal = endCheckVal / 10;
+                    /*if ((endVal / endCheckVal) % 10 < 5)
+                    {
+                        endCheckVal = endCheckVal * 10;
+                        break;
+                    }*/
+                }
+                endVal = endVal / endCheckVal;
+            }
+
+            if(endVal == 0)
+                return std::to_string(begVal);
+            else
+                return std::to_string(begVal) + "." + std::to_string(std::abs(endVal));
+        }
+        else
+        {
+            double begin = beginCheck;
+            double val = value / begin;
+            int pow = maxBegCount;
+            while (val >= 10)
+            {
+                pow++;
+                begin = begin * 10;
+                val = value / begin;
+            }
+            if(isUseUtf8 && pow < 10)
+                return Round(val) + TString((char*)textPows[pow - 2]);
+            else
+                return Round(val) + "*10^" + std::to_string(pow);
+        }
+    }
+
+    static TString FormatDouble(double value, int maxEnd, int maxBeg = 6)
+    {
+        return TFormatDouble(maxEnd, maxBeg).Round(value);
+    }
+
+};
 
 
 #endif //PROPERTYEXAMPLE_ALGORITHMS_H

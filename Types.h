@@ -14,6 +14,12 @@
 using TString = std::string;
 using TVecString = std::vector<TString>;
 using TVecDouble = std::vector<double>;
+using TVecVecDouble = std::vector<TVecDouble>;
+using TVecUInt = std::vector<size_t>;
+using TVecInt = std::vector<int>;
+using TVecBool = std::vector<bool>;
+using TVecUChar = std::vector<unsigned char>;
+using TColor = uint64_t;
 
 
 template<class T>
