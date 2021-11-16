@@ -343,4 +343,10 @@ public:
         auto e = static_cast<decltype(BEGIN)>(i);\
         __VA_ARGS__;\
     }
+
+#define PROXY(FUNC) \
+    [this](auto && ...a) { FUNC(std::forward<decltype(a)>(a)...); }
+
+#define PROXY_C(FUNC, LBD_ARGS) \
+    [LBD_ARGS](auto && ...a) { FUNC(); }
 #endif //PROPERTYEXAMPLE_ALGORITHMS_H
