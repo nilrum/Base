@@ -5,12 +5,14 @@
 #ifndef PROPERTYEXAMPLE_ALGORITHMS_H
 #define PROPERTYEXAMPLE_ALGORITHMS_H
 
+#include <Types.h>
 #include <algorithm>
 #include <cmath>
 #include <stdarg.h>
+#include <cctype>
 
 template<typename T>
-std::vector<T> Split(const T& value, typename T::value_type delim)
+typename std::vector<T> Split(const T& value, typename T::value_type delim)
 {
     size_t begin = 0;
     size_t count = 0;
@@ -78,7 +80,7 @@ T TrimBefore(const T& value, typename T::value_type delim, size_t maxCount = 0)
     return T{value.begin() + value.size() - maxCount, value.end()};
 }
 
-inline bool TryStrToInt(const TString& str, int& value)
+inline bool TryStrToInt(const std::string& str, int& value)
 {
     try{
         value = std::stoi(str);
@@ -217,7 +219,7 @@ void TakeAndMove(TArray& array, int opos, int npos, TIndexer get = TIndexer())
 }
 
 inline const char* PtrText(const char* value) { return value; }
-inline const char* PtrText(const TString& value) { return STR(value); }
+inline const char* PtrText(const std::string& value) { return STR(value); }
 
 #define STDFORMAT(FRMT, ...) StdFormat(std::snprintf(nullptr, 0, PtrText(FRMT), __VA_ARGS__) + 1, PtrText(FRMT), __VA_ARGS__)
 
