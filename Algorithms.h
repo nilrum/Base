@@ -95,21 +95,22 @@ inline bool TryStrToInt(const std::string& str, int& value)
 
 
 struct TDoubleCheck{
-
+    STATIC_ARG(double, Delta, 0.00001)
+    static double HalfDelta()
+    {
+        return Delta() / 2.;
+    }
     static bool Equal(const double& one, const double& two)
     {
         if(one > 0. && two > 0. || one < 0. && two < 0.)
-            return std::fabs(one - two) < 0.00001;
+            return std::fabs(one - two) < Delta();
         else
-            return std::fabs(one + two) < 0.00001;
+            return std::fabs(one + two) < Delta();
     }
 
     static bool Less(const double& one, const double& two)
     {
-        if(one > 0. && two > 0. || one < 0. && two < 0.)
-            return std::fabs(two) - std::fabs(one) > 0.00001;
-        else
-            return std::fabs(two + one) > 0.00001;
+        return one < two && std::fabs(two - one) >= Delta();
     }
 
     static bool Great(const double& one, const double& two)
