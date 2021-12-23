@@ -53,7 +53,7 @@ T &Single(T&& value)
     namespace INIT_##NAME{       \
         bool Fun##NAME()         \
         {                        \
-            INIT\
+            INIT ;\
             return true;         \
         }                        \
         const bool Cnst_##NAME = Fun##NAME();\

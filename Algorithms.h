@@ -333,6 +333,14 @@ public:
 
 };
 
+struct TMinMax{
+    double min = NAN;
+    double max = NAN;
+
+    bool Contains(double value) const { return value >= min && value <= max; }
+    bool IsValid() const { return std::isnan(min) == false && std::isnan(max) && min <= max; }
+};
+
 #define AND_OR_ENUM(TYPE)\
     constexpr bool operator & (TYPE lhs, TYPE rhs) { return static_cast<int>(lhs) & static_cast<int>(rhs); }\
     constexpr TYPE operator & (TYPE lhs, int rhs) { return static_cast<TYPE>(static_cast<int>(lhs) & rhs); }\
