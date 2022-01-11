@@ -5,7 +5,7 @@
 #ifndef PROPERTYEXAMPLE_ALGORITHMS_H
 #define PROPERTYEXAMPLE_ALGORITHMS_H
 
-#include <Types.h>
+#include "Types.h"
 #include <algorithm>
 #include <cmath>
 #include <stdarg.h>
