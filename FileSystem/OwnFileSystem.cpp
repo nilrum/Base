@@ -29,6 +29,12 @@ namespace fs {
         return dwAttrib != INVALID_FILE_ATTRIBUTES;
     }
 
+    void copy( const fs::path& from, const fs::path& to)
+    {
+        CopyFileW(STR(WStringFromUtf8(from.string())),
+                STR(WStringFromUtf8(to.string())), false);
+    }
+
     bool remove(const fs::path &value)
     {
         auto p = WStringFromUtf8(value.string());

@@ -92,6 +92,18 @@ inline bool TryStrToInt(const std::string& str, int& value)
     }
 }
 
+inline bool TryStrToDouble(const std::string& str, double& value)
+{
+    try{
+        value = std::stof(str);
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
 
 
 struct TDoubleCheck{

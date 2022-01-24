@@ -32,6 +32,7 @@ namespace fs{
     path operator/( const path& lhs, const path& rhs );
 
     bool exists(const path& value);
+    void copy( const path& from, const path& to);
     bool remove(const path& value);
     std::uintmax_t remove_all(const path& value);
 

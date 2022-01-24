@@ -124,3 +124,29 @@ std::wstring WStringFromUtf8(const TString &value)
 #endif
     return res;
 }
+
+TResult FileLines(TVecString &lines, const TString &path)
+{
+    auto file = OpenFile(path);
+    if(file == nullptr) return TFileResult::ErrorOpen;
+    TString line;
+    auto c = std::fgetc(file.get());
+    while(c != EOF)
+    {
+        if(c == '\n' || c == '\r')//если символ конца строки
+        {
+            if(line.empty() == false)
+            {
+                lines.push_back(line);
+                line.clear();
+            }
+        }
+        else
+            line.push_back(c);
+
+        c = std::fgetc(file.get());
+    }
+    if(line.empty() == false)
+        lines.push_back(line);
+    return TResult();
+}

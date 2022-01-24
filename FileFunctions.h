@@ -44,5 +44,6 @@ std::wstring WStringFromUtf8(const TString &value);
 
 TString Merge(const TVecString& values, typename TString::value_type delim);
 
+TResult FileLines(TVecString& lines, const TString& path);
 
 #endif //PROPERTY2_FILEFUNCTIONS_H
