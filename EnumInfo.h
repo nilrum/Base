@@ -57,7 +57,7 @@ public:
         return -1;
     }
 
-    int IndexFromValue(double value) const  //возвращает номер по порядкук по значению
+    int IndexFromValue(double value) const  //возвращает номер по порядку по значению
     {
         for (size_t i = 0; i < values.size(); i++)
             if (values[i] == value) return i;
@@ -144,10 +144,11 @@ public:
 
     inline bool IsValid() const { return info != nullptr; }
     inline int64_t Index() const { return index; }
-    inline const std::type_info& Info() const { return *info; }
-    inline TString Name() const { return TEnumInfo::EnumInfo(*info).Name(index); }
-    inline const TVecString& Names() const { return TEnumInfo::EnumInfo(*info).Names(); }
-    inline TString TypeEnum() const { return TEnumInfo::EnumInfo(*info).TypeEnum(); }
+    inline const std::type_info& Info() const   { return *info; }
+    inline TString Name() const                 { return TEnumInfo::EnumInfo(*info).Name(index); }
+    inline const TVecString& Names() const      { return TEnumInfo::EnumInfo(*info).Names(); }
+    inline TString TypeEnum() const             { return TEnumInfo::EnumInfo(*info).TypeEnum(); }
+    inline const TEnumInfo& EnumInfo() const    { return TEnumInfo::EnumInfo(*info); }
 };
 
 

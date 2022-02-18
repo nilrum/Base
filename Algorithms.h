@@ -350,7 +350,11 @@ struct TMinMax{
     double max = NAN;
 
     bool Contains(double value) const { return value >= min && value <= max; }
-    bool IsValid() const { return std::isnan(min) == false && std::isnan(max) && min <= max; }
+    bool Contains(double b, double e) const { return Contains(b) && Contains(e); }
+
+    bool ParentContains(double b, double e) const { return min >= b && min < e && max > b && max <= e; }
+
+    bool IsValid() const { return std::isnan(min) == false && std::isnan(max) == false && min <= max; }
 };
 
 #define AND_OR_ENUM(TYPE)\
@@ -370,6 +374,6 @@ struct TMinMax{
 #define PROXY(FUNC) \
     [this](auto && ...a) { FUNC(std::forward<decltype(a)>(a)...); }
 
-#define PROXY_C(FUNC, LBD_ARGS) \
-    [LBD_ARGS](auto && ...a) { FUNC(); }
+#define PROXY_C(FUNC) \
+    [this](auto && ...a) { FUNC(); }
 #endif //PROPERTYEXAMPLE_ALGORITHMS_H
