@@ -24,7 +24,7 @@ endif()
 include(FetchContent)
 
 #Parameters
-macro(Declare NAME REP INCL ADD)
+macro(Declare NAME REP TAG INCL ADD)
     set(${NAME}_DIR ${FETCH_DIR}/${NAME})
     if(${INCL} STREQUAL ".")
         set(${NAME}_INCL ${${NAME}_DIR})
@@ -38,6 +38,7 @@ macro(Declare NAME REP INCL ADD)
     #Вариант с иcпользованием FetchContent
     FetchContent_Declare(${NAME}
             GIT_REPOSITORY https://${REP}.git
+            GIT_TAG ${TAG}
             SOURCE_DIR ${${NAME}_DIR})
     FetchContent_Populate(${NAME})
 
@@ -51,12 +52,12 @@ macro(Declare NAME REP INCL ADD)
     set(${PROJECT_NAME}_DEPS_INCL ${${PROJECT_NAME}_DEPS_INCL} ${${NAME}_INCL} ${${NAME}_DEPS_INCL})
 endmacro()
 
-macro(Populate NAME REP INCL)
-    Declare(${NAME} ${REP} ${INCL} OFF)
+macro(Populate NAME REP TAG INCL)
+    Declare(${NAME} ${REP} ${TAG} ${INCL} OFF)
 endmacro()
 
-macro(MakeAvailable NAME REP INCL)
-    Declare(${NAME} ${REP} ${INCL} ON)
+macro(MakeAvailable NAME REP TAG INCL)
+    Declare(${NAME} ${REP} ${TAG} ${INCL} ON)
 endmacro()
 
 #Макрос делает доступным родительскому проекту текущие зависимости
