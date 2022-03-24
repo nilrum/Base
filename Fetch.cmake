@@ -38,7 +38,6 @@ macro(Declare NAME REP INCL ADD)
     #Вариант с иcпользованием FetchContent
     FetchContent_Declare(${NAME}
             GIT_REPOSITORY https://${REP}.git
-            GIT_TAG origin/master
             SOURCE_DIR ${${NAME}_DIR})
     FetchContent_Populate(${NAME})
 
